@@ -1,0 +1,26 @@
+version: '3'
+services:
+  web:
+    container_name: web
+    build: ./docker/nginx
+    ports:
+      - 8080:80
+    volumes:
+      - ./src:/var/www/html
+  app:
+    container_name: app
+    build: ./docker/php
+    volumes:
+      - ./src:/var/www/html
+  mysql:
+    image: mysql:5.7.41
+    command: bash -c 'usermod -o -u 1000 mysql; groupmod -o -g 1000 mysql; chown -R mysql:root /var/run/mysqld/; /entrypoint.sh mysqld --user=mysql --console --innodb_file_format=Barracuda --innodb-large-prefix=true --innodb-file-per-table=true --max_allowed_packet=32M --character-set-server=utf8mb4'
+    volumes:
+      - ./mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+    container_name: app-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: dbman
+      MYSQL_PASSWORD: password 
